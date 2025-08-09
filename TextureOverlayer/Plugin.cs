@@ -1,8 +1,10 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using Dalamud.Game.Command;
 using Dalamud.IoC;
 using Dalamud.Plugin;
 using System.IO;
+using System.Linq;
 using System.Reflection;
 using Dalamud.Interface.ImGuiFileDialog;
 using Dalamud.Interface.Textures;
@@ -31,7 +33,7 @@ public class Plugin : IDalamudPlugin
     public readonly WindowSystem WindowSystem = new("TextureOverlayer");
     //private ConfigWindow ConfigWindow { get; init; }
     private MainWindow MainWindow { get; init; }
-
+    private WarningWindow WarningWindow { get; init; }
     private ItemPicker ItemPicker { get; init; }
     
 
@@ -39,16 +41,67 @@ public class Plugin : IDalamudPlugin
 
     public Plugin(IDalamudPluginInterface pluginInterface)
     {
+        MainWindow = new MainWindow(this);
+        ItemPicker = new ItemPicker(this);
+        
+       //PluginListInvalidationKind kind,  IEnumerable<string> affectedInternalNames 
+        void OnActivePluginsChanged(IActivePluginsChangedEventArgs args) => UpdateActivePluginState(args.Kind, args.AffectedInternalNames);
+
+        void UpdateActivePluginState(PluginListInvalidationKind kind,  IEnumerable<string> affectedInternalNames)
+        {
+            if (kind == PluginListInvalidationKind.Loaded && affectedInternalNames.Contains("Penumbra"))
+            {
+                Init(pluginInterface);
+                pluginInterface.ActivePluginsChanged -= OnActivePluginsChanged;
+            }
+            
+            
+        }
+            
+        if (pluginInterface.InstalledPlugins.All(p => p.InternalName != "Penumbra"))
+        {
+            WindowSystem.AddWindow(WarningWindow);
+            return;
+        }else if (pluginInterface.InstalledPlugins.Any(p => p is { InternalName: "Penumbra", IsLoaded: true }))
+        {
+            Init(pluginInterface);
+        }
+        else
+        {
+            pluginInterface.ActivePluginsChanged += OnActivePluginsChanged;
+        }
+        
+        
+
+        
+        
+    
+
+
+    }
+
+    public void Init(IDalamudPluginInterface pluginInterface)
+    {
         pluginInterface.Create<Service>();
         Service.Configuration = pluginInterface.GetPluginConfig() as Configuration ?? new Configuration();
         Service.penumbraApi = new PenumbraIpc(pluginInterface);
         // you might normally want to embed resources and load them from the manifest stream
-        Service.penumbraApi.Modlist = new GetModList(pluginInterface).Invoke();
+        try
+        {
+            Service.penumbraApi.Modlist = new GetModList(pluginInterface).Invoke();
+        }
+        catch (Exception e)
+        {
+
+            WarningWindow.Draw();
+            Console.WriteLine(e);
+            return;
+        }
+
         Service.DataService = new DataService();
         
         //ConfigWindow = new ConfigWindow(this);
-        MainWindow = new MainWindow(this);
-        ItemPicker = new ItemPicker(this);
+
         //WindowSystem.AddWindow(ConfigWindow);
         WindowSystem.AddWindow(MainWindow);
         WindowSystem.AddWindow(ItemPicker);
@@ -87,9 +140,6 @@ public class Plugin : IDalamudPlugin
             Service.DataService.AllCombinations.Add(Service.DataService.ReadConfig(path));
         }
         
-    
-
-
     }
 
     public void Dispose()

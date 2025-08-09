@@ -5,7 +5,7 @@ using System.Numerics;
 using Dalamud.Interface.Utility;
 using Dalamud.Interface.Utility.Raii;
 using Dalamud.Interface.Windowing;
-using ImGuiNET;
+using Dalamud.Bindings.ImGui;
 using Lumina;
 using Lumina.Excel.Sheets;
 using Lumina.Data.Files;
@@ -130,7 +130,7 @@ public class ItemPicker : Window, IDisposable
                 else
                 {
 
-                    ImGui.Image(previewTexture.TextureWrap.ImGuiHandle,
+                    ImGui.Image(previewTexture.TextureWrap.Handle,
                                 new Vector2((ImGui.GetContentRegionAvail().X), (ImGui.GetContentRegionAvail().X)));
                     if (ImGui.Button($"Confirm Texture"))
                     {

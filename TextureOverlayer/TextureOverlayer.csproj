@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
-<Project Sdk="Dalamud.NET.Sdk/12.0.2">
+<Project Sdk="Dalamud.NET.Sdk/13.0.0">
   <PropertyGroup>
-    <Version>0.4.3</Version>
+    <Version>0.5.0</Version>
     <Description>Penumbra Image Manipulation Plugin</Description>
     <PackageProjectUrl>https://github.com/Glorou/PenumbraImageManipulationPlugin</PackageProjectUrl>
     <PackageLicenseExpression>AGPL-3.0-or-later</PackageLicenseExpression>
     <IsPackable>false</IsPackable>
-    <AssemblyVersion>0.4.5</AssemblyVersion>
+    <AssemblyVersion>0.5.0</AssemblyVersion>
   </PropertyGroup>
 
     <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -16,9 +16,9 @@
     
   <ItemGroup>
     <PackageReference Include="Blake3" Version="2.0.0" />
-    <PackageReference Include="Penumbra.Api" Version="5.6.1" />
+    <PackageReference Include="Penumbra.Api" Version="5.10.0" />
     <PackageReference Include="SharpDX.Direct3D11" Version="4.2.0" />
-    <PackageReference Include="SixLabors.ImageSharp" Version="3.1.7" />
+    <PackageReference Include="SixLabors.ImageSharp" Version="3.1.11" />
   </ItemGroup>
     
 
@@ -34,10 +34,11 @@
     </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\OtterGui\OtterGui.csproj" />
+    <ProjectReference Include="..\OtterTex\OtterTex\OtterTex.csproj" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="OtterTex">
-      <HintPath>..\..\Penumbra\Penumbra\bin\Debug\OtterTex.dll</HintPath>
+      <HintPath>..\Include\OtterTex.dll</HintPath>
     </Reference>
   </ItemGroup>
 </Project>

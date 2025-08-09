@@ -9,7 +9,7 @@ using Dalamud.Interface.Utility;
 using Dalamud.Interface.Utility.Raii;
 using Dalamud.Interface.Windowing;
 using Dalamud.Utility;
-using ImGuiNET;
+using Dalamud.Bindings.ImGui;
 using Lumina.Excel.Sheets;
 using TextureOverlayer.Interop;
 using TextureOverlayer.Textures;
@@ -329,7 +329,7 @@ public class MainWindow : Window, IDisposable
                         Service.TextureProvider
                                .GetFromManifestResource(Assembly.GetExecutingAssembly(),
                                                         "TextureOverlayer.Placeholder.png").GetWrapOrEmpty()
-                               .ImGuiHandle,
+                               .Handle,
                         new Vector2((Math.Min(ImGui.GetContentRegionAvail().X, ImGui.GetContentRegionAvail().Y) * .75f),
                                     Math.Min(ImGui.GetContentRegionAvail().X, ImGui.GetContentRegionAvail().Y) * .75f));
                 }

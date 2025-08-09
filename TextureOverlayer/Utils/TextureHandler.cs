@@ -15,7 +15,7 @@ using FFXIVClientStructs;
 using FFXIVClientStructs.FFXIV.Client.Game.UI;
 using FFXIVClientStructs.FFXIV.Component.GUI;
 using FFXIVClientStructs.Havok.Common.Serialize.Util;
-using ImGuiNET;
+using Dalamud.Bindings.ImGui;
 using Lumina.Excel;
 using Newtonsoft.Json;
 using Penumbra.Api.IpcSubscribers;
