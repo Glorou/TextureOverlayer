@@ -164,13 +164,13 @@ public class ImageCombination
     public void AddLayer(string path)
     {
         layers.Add(new ImageLayer(path, CombineOp.Over, ResizeOp.ToRight));
-        Service.Framework.Run(Compile);
+        Task.Run(() => {Compile();});
     }
 
     public void RemoveLayer(ImageLayer layer)
     {
         layers.Remove(layer);
-        Compile();
+        Task.Run(() => {Compile();});
     }
     
 
@@ -218,7 +218,6 @@ public class ImageCombination
 
     public async Task newStackOps(CombinedTexture tex, ImageLayer layer)
     {
-        
         tex.Update();
         tex.setOps(layer);
         var waiting = tex.CombineImage();

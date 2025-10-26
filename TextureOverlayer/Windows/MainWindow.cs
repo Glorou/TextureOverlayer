@@ -3,6 +3,8 @@ using System.IO;
 using System.Linq;
 using System.Numerics;
 using System.Reflection;
+using System.Threading;
+using System.Threading.Tasks;
 using Dalamud.Interface;
 using Dalamud.Interface.ImGuiFileDialog;
 using Dalamud.Interface.Utility;
@@ -33,6 +35,10 @@ public class MainWindow : Window, IDisposable
     private Vector4 green = new Vector4(0, 204, 0, 1);
 
     private Vector4 red = new Vector4(220, 0, 0, 1);
+    
+    Task? task = null;
+    
+    CancellationTokenSource? cts = null;
     // We give this window a hidden ID using ##
     // So that the user will see "My Amazing Window" as window title,
     // but for ImGui the ID is "My Amazing Window##With a hidden ID"
@@ -187,7 +193,7 @@ public class MainWindow : Window, IDisposable
                     if (ImGui.Selectable(combo.Name))
                     {
                         selectedCombination = combo;
-                        selectedCombination.Compile();
+                        Task.Run(() => { selectedCombination.Compile();});
                         tempGamePath = combo._gamepath;
                     }
 
@@ -225,7 +231,7 @@ public class MainWindow : Window, IDisposable
             {
                 selectedCombination.FileName = Service.DataService.WriteTexFile(selectedCombination);
                 Service.DataService.WriteConfig(selectedCombination);
-                selectedCombination.Compile();
+                Task.Run(() => { selectedCombination.Compile();});
                 if(selectedCombination.Enabled){Service.penumbraApi.RedrawAll();}
             }
 
@@ -374,7 +380,7 @@ public class MainWindow : Window, IDisposable
                                 if (ImGui.SmallButton($"{image.getEyecon()}##{image._friendlyName}"))
                                 {
                                     image.FlipState();
-                                    selectedCombination.Compile();
+                                    Task.Run(() => { selectedCombination.Compile();});
                                 }
                                 ImGui.PopStyleColor(3);
                             }
@@ -406,7 +412,7 @@ public class MainWindow : Window, IDisposable
                         {
                             TextureHandler.Swap(selectedCombination.Layers, selectedIndex, selectedIndex + 1);
                             selectedIndex++;
-                            selectedCombination.Compile();
+                            Task.Run(() => { selectedCombination.Compile();});
                         }
                         if(selectedCombination.Layers[selectedIndex] == selectedCombination.Layers.Last()){ImGui.EndDisabled();}
                         if(selectedCombination.Layers[selectedIndex] == selectedCombination.Layers.First()){ImGui.BeginDisabled();}
@@ -415,7 +421,7 @@ public class MainWindow : Window, IDisposable
                         {
                             TextureHandler.Swap(selectedCombination.Layers, selectedIndex, selectedIndex - 1);
                             selectedIndex--;
-                            selectedCombination.Compile();
+                            Task.Run(() => { selectedCombination.Compile();});
                         }
                         if(selectedCombination.Layers[selectedIndex] == selectedCombination.Layers.First()){ImGui.EndDisabled();}
                         
@@ -432,18 +438,18 @@ public class MainWindow : Window, IDisposable
                             if (ImGui.Selectable(TextureHandler.ResizeOpLabels[0]))
                             {
                                 selectedCombination.Layers[selectedIndex]._combineOp = CombineOp.Over;
-                                selectedCombination.Compile();
+                                Task.Run(() => { selectedCombination.Compile();});
                             }
 
                             if (ImGui.Selectable(TextureHandler.ResizeOpLabels[4]))
                             {
                                 selectedCombination.Layers[selectedIndex]._combineOp = CombineOp.SubtractChannels;
-                                selectedCombination.Compile();
+                                Task.Run(() => { selectedCombination.Compile();});
                             }
                             if (ImGui.Selectable(TextureHandler.ResizeOpLabels[6]))
                             {
                                 selectedCombination.Layers[selectedIndex]._combineOp = CombineOp.SoftLight;
-                                selectedCombination.Compile();
+                                Task.Run(() => { selectedCombination.Compile();});
                             }
                             /*if (ImGui.Selectable(TextureHandler.ResizeOpLabels[5]))
                             {

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net.Mime;
+using System.Threading.Tasks;
 using Dalamud.Utility;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -122,7 +123,7 @@ public class DataService
         RemoveImageCombination(combination.Name);
         _allCombinations.Add(temp);
         WriteConfig(temp);
-        temp.Compile();
+        Task.Run(() => { temp.Compile();});
         return temp;
     }
 

@@ -7,8 +7,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TextureOverlayer", "Texture
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OtterGui", "OtterGui\OtterGui.csproj", "{450B0523-2588-4BA8-B62D-1425EF9F5050}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OtterGuiInternal", "OtterGuiInternal\OtterGuiInternal.csproj", "{B435F4E6-843C-4290-B0B4-B50CA0148699}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -23,10 +21,6 @@ Global
 		{450B0523-2588-4BA8-B62D-1425EF9F5050}.Debug|x64.Build.0 = Debug|x64
 		{450B0523-2588-4BA8-B62D-1425EF9F5050}.Release|x64.ActiveCfg = Release|x64
 		{450B0523-2588-4BA8-B62D-1425EF9F5050}.Release|x64.Build.0 = Release|x64
-		{B435F4E6-843C-4290-B0B4-B50CA0148699}.Debug|x64.ActiveCfg = Debug|Any CPU
-		{B435F4E6-843C-4290-B0B4-B50CA0148699}.Debug|x64.Build.0 = Debug|Any CPU
-		{B435F4E6-843C-4290-B0B4-B50CA0148699}.Release|x64.ActiveCfg = Release|Any CPU
-		{B435F4E6-843C-4290-B0B4-B50CA0148699}.Release|x64.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

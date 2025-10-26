@@ -5,5 +5,7 @@
     <mapping directory="$PROJECT_DIR$/OtterGui" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/OtterGui/OtterGuiInternal" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/OtterGuiInternal" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/OtterTex" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/OtterTex/DirectXTex" vcs="Git" />
   </component>
 </project>
