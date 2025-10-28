@@ -1,8 +1,11 @@
 ﻿using System;
+using System.Buffers.Text;
 using System.IO;
 using System.Linq;
 using System.Numerics;
 using System.Reflection;
+using System.Text;
+using System.Text.Unicode;
 using System.Threading;
 using System.Threading.Tasks;
 using Dalamud.Interface;
@@ -12,6 +15,7 @@ using Dalamud.Interface.Utility.Raii;
 using Dalamud.Interface.Windowing;
 using Dalamud.Utility;
 using Dalamud.Bindings.ImGui;
+using FFXIVClientStructs.FFXIV.Client.System.String;
 using Lumina.Excel.Sheets;
 using TextureOverlayer.Interop;
 using TextureOverlayer.Textures;
@@ -193,7 +197,9 @@ public class MainWindow : Window, IDisposable
                     if (ImGui.Selectable(combo.Name))
                     {
                         selectedCombination = combo;
-                        Task.Run(() => { selectedCombination.Compile();});
+                        Service.DataService.SetSelectedCombo(combo.Name);
+                        if(!selectedCombination.CombinedTexture.IsLoaded)
+                            Task.Run(() => { selectedCombination.Compile();});
                         tempGamePath = combo._gamepath;
                     }
 
@@ -257,6 +263,14 @@ public class MainWindow : Window, IDisposable
         {
             using (var imageContainer = ImRaii.Child("imageContainer", new Vector2(ImGui.GetContentRegionAvail().X * .75f, ImGui.GetContentRegionAvail().Y)))
             {
+                var drawsize = new Vector2(
+                    (Math.Min(ImGui.GetContentRegionAvail().X,
+                              ImGui.GetContentRegionAvail().Y) * .75f),
+                    Math.Min(ImGui.GetContentRegionAvail().X,
+                             ImGui.GetContentRegionAvail().Y) * .75f);
+                var padding = (ImGui.GetWindowSize() - drawsize) / 2;
+                
+                ImGui.SetCursorPosX(ImGui.GetCursorPosX() + padding.X);
                 if (selectedCombination != null && selectedCombination.Layers.Count >= 1 &&
                     selectedCombination.LoadState == 2)
                 {
@@ -266,7 +280,7 @@ public class MainWindow : Window, IDisposable
                                                                            ImGui.GetContentRegionAvail().Y) * .75f),
                                                                  Math.Min(ImGui.GetContentRegionAvail().X,
                                                                           ImGui.GetContentRegionAvail().Y) * .75f));
-
+                    ImGui.SetCursorPosX(ImGui.GetCursorPosX() + padding.X);
                     if (ImGui.Button("Select Collection"))
                     {
                         ImGui.OpenPopup("Select Collection##Window");
@@ -317,8 +331,9 @@ public class MainWindow : Window, IDisposable
 
                     }
 
-
+                    ImGui.SetCursorPosX(ImGui.GetCursorPosX() + padding.X);
                     ImGui.TextUnformatted("Game path to replace:");
+                    ImGui.SetCursorPosX(ImGui.GetCursorPosX() + padding.X);
                     ImGui.InputText("##replacePath", ref tempGamePath, 128);
                     ImGui.SameLine();
                     if (ImGui.Button("Set"))
@@ -329,7 +344,7 @@ public class MainWindow : Window, IDisposable
 
 
                 }
-                else
+                else if(selectedCombination == null ||  selectedCombination.Layers.Count == 0)
                 {
                     ImGui.Image(
                         Service.TextureProvider
@@ -338,6 +353,11 @@ public class MainWindow : Window, IDisposable
                                .Handle,
                         new Vector2((Math.Min(ImGui.GetContentRegionAvail().X, ImGui.GetContentRegionAvail().Y) * .75f),
                                     Math.Min(ImGui.GetContentRegionAvail().X, ImGui.GetContentRegionAvail().Y) * .75f));
+                }
+                else
+                {
+                    ImGui.SetCursorPos(new Vector2(ImGui.GetContentRegionAvail().X/2, ImGui.GetContentRegionAvail().Y/3));
+                    OtterGui.Text.ImUtf8.Spinner(new Utf8String("Load Wheel").AsSpan(),15f, 3, 0xFFFFFFFF );
                 }
 
                 ImGui.EndGroup();
