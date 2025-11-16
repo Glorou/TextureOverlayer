@@ -41,6 +41,11 @@ public class DataService
         return _allCombinations.Find(x => x.Name == name);
     }
 
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="name"></param>
+    /// <returns></returns>
     public bool RemoveImageCombination(String name)
     {
         try
@@ -78,7 +83,10 @@ public class DataService
         
     }
 
-
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="name"></param>
     public void SetSelectedCombo(string name)
     {
         selectedCombination = name;
@@ -108,6 +116,11 @@ public class DataService
     
     
     //TODO: Figure out a better more robust naming scheme for this 
+    
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="combination"></param>
     public void WriteConfig(ImageCombination combination)
     {
         var json = JsonConvert.SerializeObject(combination, Formatting.Indented, new HashConverter());
@@ -115,6 +128,11 @@ public class DataService
         
     }
 
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="combination"></param>
+    /// <returns></returns>
     public ImageCombination ReloadComboFromFile(ImageCombination combination)
     {
         var _path = Service.Configuration.PluginFolder + "\\" + combination.Name + ".json";
@@ -129,6 +147,11 @@ public class DataService
 
     
     //TODO: Add support for BC compression
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="combination"></param>
+    /// <returns></returns>
     public string WriteTexFile(ImageCombination combination)
     {
         Service.TextureManager.SaveAs(CombinedTexture.TextureSaveType.AsIs, false, true,
@@ -138,6 +161,11 @@ public class DataService
         return combination.Name + ".tex";
     }
 
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="path"></param>
+    /// <returns></returns>
     public ImageCombination ReadConfig(String path)
     {
 

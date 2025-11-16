@@ -237,7 +237,9 @@ public class ImageCombination
 
 
 
-
+/// <summary>
+/// 
+/// </summary>
 [Serializable]
 public class ImageLayer
 {
@@ -260,6 +262,13 @@ public class ImageLayer
     [JsonIgnore]
     private Texture? _texture;
 
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="_path"></param>
+    /// <param name="combineOp"></param>
+    /// <param name="resizeOp"></param>
+    /// <param name="enabled"></param>
     public ImageLayer(String _path, CombineOp combineOp, ResizeOp resizeOp, bool enabled = true)
     {
 
@@ -271,6 +280,14 @@ public class ImageLayer
         _enabled = enabled;
         _friendlyName = _path.Split('\\').Last().Split(".").First();
     }
+    
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="_fileHash"></param>
+    /// <param name="combineOp"></param>
+    /// <param name="resizeOp"></param>
+    /// <param name="enabled"></param>
     
     [JsonConstructor]
     public ImageLayer(Blake3.Hash _fileHash, CombineOp combineOp, ResizeOp resizeOp, bool enabled = true)
@@ -284,19 +301,28 @@ public class ImageLayer
         _enabled = enabled;
     }
 
-    
+    /// <summary>
+    /// Turns layer on or off
+    /// </summary>
     public void FlipState()
     {
         _enabled = !_enabled;
         
     }
     
-
+    /// <summary>
+    /// Gets the FontAwesome String for the eye
+    /// </summary>
+    /// <returns></returns>
     public String getEyecon()
     {
         return _enabled ? FontAwesomeIcon.Eye.ToIconString() : FontAwesomeIcon.EyeSlash.ToIconString();
     }
     
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <returns></returns>
     public Texture GetTexture() => _texture;
 
 
@@ -307,6 +333,9 @@ public class ImageLayer
 
 public static class TextureHandler
 {
+    /// <summary>
+    /// 
+    /// </summary>
     public static readonly IReadOnlyList<string> ResizeOpLabels = new string[]
     {
         "Overlay",
@@ -317,6 +346,14 @@ public static class TextureHandler
         "Multiply",
         "Soft Light"
     };
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="list"></param>
+    /// <param name="indexA"></param>
+    /// <param name="indexB"></param>
+    /// <typeparam name="T"></typeparam>
+    /// <returns></returns>
     public static IList<T> Swap<T>(IList<T> list, int indexA, int indexB)
     {
         (list[indexA], list[indexB]) = (list[indexB], list[indexA]);

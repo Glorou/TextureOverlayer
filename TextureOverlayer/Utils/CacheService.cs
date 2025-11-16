@@ -27,7 +27,9 @@ public class CacheService
         LoadCache();
     }
 
-    //temporary workaround
+    /// <summary>
+    /// 
+    /// </summary>
     private void LoadCache()
     {
         foreach (var file in Directory.GetFiles(_cacheDir))
@@ -61,8 +63,15 @@ public class CacheService
     }
     */
 
-
-
+    /// <summary>
+    /// This function is called when a user loads a new layer for the first time, it checks if we have an image that
+    /// matches the hash of the file they want, and if we do we use that, if not we copy it to our cache and add the
+    /// hash to our dict
+    /// </summary>
+    /// <param name="texture">Texture object we are loading in to, needs to be initialised and cannot be null</param>
+    /// <param name="_path"></param>
+    /// <returns></returns>
+    
     public Blake3.Hash TryGetCache(Texture texture, string _path)
     {
         var hash = Blake3.Hasher.Hash(File.ReadAllBytes(_path));
@@ -84,12 +93,22 @@ public class CacheService
         }
 
     }
+    /// <summary>
+    /// This is called when the json constructor tries to reload everything at startup
+    /// </summary>
+    /// <param name="texture"></param>
+    /// <param name="_hash"></param>
+    /// <returns></returns>
     public Blake3.Hash TryGetCache(Texture texture, Blake3.Hash _hash)
     {
         texture.Load(Service.TextureManager,_cacheDir + _rawCache[_hash]);
         return _hash;
     }
 
+    /// <summary>
+    /// Generates a set of 3 random chars to append to the file we are copying to our cache
+    /// </summary>
+    /// <returns></returns>
     private String GenerateAppend()
     {
         var rand = new Random();

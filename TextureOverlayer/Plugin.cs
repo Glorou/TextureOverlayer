@@ -35,7 +35,8 @@ public class Plugin : IDalamudPlugin
     private MainWindow MainWindow { get; init; }
     private WarningWindow WarningWindow { get; init; }
     private ItemPicker ItemPicker { get; init; }
-    
+
+    public (int, int) PenumbraApiVersion;
 
 
 
@@ -70,14 +71,6 @@ public class Plugin : IDalamudPlugin
         {
             pluginInterface.ActivePluginsChanged += OnActivePluginsChanged;
         }
-        
-        
-
-        
-        
-    
-
-
     }
 
     public void Init(IDalamudPluginInterface pluginInterface)
@@ -98,6 +91,7 @@ public class Plugin : IDalamudPlugin
             return;
         }
 
+        PenumbraApiVersion = Service.penumbraApi.ApiVersion();
         Service.DataService = new DataService();
         
         //ConfigWindow = new ConfigWindow(this);

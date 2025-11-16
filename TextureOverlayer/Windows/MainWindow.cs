@@ -238,7 +238,21 @@ public class MainWindow : Window, IDisposable
                 selectedCombination.FileName = Service.DataService.WriteTexFile(selectedCombination);
                 Service.DataService.WriteConfig(selectedCombination);
                 Task.Run(() => { selectedCombination.Compile();});
-                if(selectedCombination.Enabled){Service.penumbraApi.RedrawAll();}
+                if (selectedCombination.Enabled)
+                {
+                    if (Plugin.PenumbraApiVersion.Item2 <= 12)
+                    {
+                        Service.penumbraApi.RedrawAll();  
+                    }
+                    else
+                    {
+                        foreach (var collection in selectedCombination.collection)
+                        {
+                            Service.penumbraApi.RedrawCollection(collection.Key);
+                        }
+                    }
+
+                }
             }
 
             ReloadFromFileButton();

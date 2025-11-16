@@ -20,12 +20,6 @@
         "resolved": "1.2.25",
         "contentHash": "xCXiw7BCxHJ8pF6wPepRUddlh2dlQlbr81gXA72hdk4FLHkKXas7EH/n+fk5UCA/YfMqG1Z6XaPiUjDbUNBUzg=="
       },
-      "Penumbra.Api": {
-        "type": "Direct",
-        "requested": "[5.10.0, )",
-        "resolved": "5.10.0",
-        "contentHash": "ZRIIXQCluNlLoI4I4gNYuYXqb7p48OR1P2/LcL27owToR/A/IG0mH8Ks2HguB/Kjq4RpCinaVkyufpGxGspbTA=="
-      },
       "SharpDX.Direct3D11": {
         "type": "Direct",
         "requested": "[4.2.0, )",

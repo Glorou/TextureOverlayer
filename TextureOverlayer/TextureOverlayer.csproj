@@ -1,22 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Project Sdk="Dalamud.NET.Sdk/13.0.0">
   <PropertyGroup>
-    <Version>0.5.0</Version>
+    <Version>0.5.1</Version>
     <Description>Penumbra Image Manipulation Plugin</Description>
     <PackageProjectUrl>https://github.com/Glorou/PenumbraImageManipulationPlugin</PackageProjectUrl>
     <PackageLicenseExpression>AGPL-3.0-or-later</PackageLicenseExpression>
     <IsPackable>false</IsPackable>
-    <AssemblyVersion>0.5.0</AssemblyVersion>
+    <AssemblyVersion>0.5.1</AssemblyVersion>
   </PropertyGroup>
-
-    <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-
-        <OutputPath>C:\Users\Karou\AppData\Roaming\XIVLauncher\devPlugins\$(MSBuildProjectName)</OutputPath>
-    </PropertyGroup>
+    
     
   <ItemGroup>
     <PackageReference Include="Blake3" Version="2.0.0" />
-    <PackageReference Include="Penumbra.Api" Version="5.10.0" />
     <PackageReference Include="SharpDX.Direct3D11" Version="4.2.0" />
     <PackageReference Include="SixLabors.ImageSharp" Version="3.1.11" />
   </ItemGroup>
@@ -28,6 +23,7 @@
 
     <ItemGroup>
         <Content Include="..\include\DirectXTexC.dll">
+            
             <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
             <Visible>false</Visible>
         </Content>
@@ -39,6 +35,9 @@
   <ItemGroup>
     <Reference Include="OtterTex">
       <HintPath>..\Include\OtterTex.dll</HintPath>
+    </Reference>
+    <Reference Include="Penumbra.Api">
+      <HintPath>..\..\Penumbra\Penumbra\bin\Debug\Penumbra.Api.dll</HintPath>
     </Reference>
   </ItemGroup>
 </Project>

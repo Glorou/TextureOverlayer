@@ -27,6 +27,9 @@ namespace TextureOverlayer.Interop
         private readonly RemoveTemporaryMod _removeTemporaryMod = new RemoveTemporaryMod(pluginInterface);
         private readonly RedrawAll _redrawAll = new RedrawAll(pluginInterface);
 
+        private readonly ApiVersion _apiVersion = new ApiVersion(pluginInterface);
+        private readonly RedrawCollectionMembers _redrawCollection = new RedrawCollectionMembers(pluginInterface);
+
         private GetModPath _getModPath = new GetModPath(pluginInterface);
         public Dictionary<string, string> Modlist
         {
@@ -40,6 +43,14 @@ namespace TextureOverlayer.Interop
             _redrawAll.Invoke();
         }
 
+        public (int, int) ApiVersion()
+        {
+            return _apiVersion.Invoke();
+        }
+        public void RedrawCollection(Guid Collection)
+        {
+            _redrawCollection.Invoke(Collection);
+        }
         public String GetModDirectory()
         {
             return _getModDirectory.Invoke();
@@ -85,8 +96,6 @@ namespace TextureOverlayer.Interop
         public PenumbraApiEc AddTemporaryModCollection(ImageCombination texture, (Guid, string) Collection)
         {
             var temp =  _addTemporaryMod.Invoke(texture.Name +"TO", Collection.Item1, new Dictionary<string, string>{{texture._gamepath, Service.Configuration.PluginFolder +"\\"+ texture.FileName}}, string.Empty, 99);
-            ;
-            _redrawAll.Invoke();
             return temp;
         }
         /*

@@ -3,7 +3,7 @@
   "Name": "Texture Overlayer", 
   "Punchline": "Overlay textures in-game quickly", 
   "Description": "A relatively robust tool that allows you to non-destructively edit textures.", 
-  "AssemblyVersion":"0.4.5",
+  "AssemblyVersion":"0.5.1",
   "ApplicableVersion": "any",
   "Tags": [
   ]
