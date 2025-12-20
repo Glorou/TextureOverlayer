@@ -44,7 +44,6 @@ public class Plugin : IDalamudPlugin
     {
         MainWindow = new MainWindow(this);
         ItemPicker = new ItemPicker(this);
-        
        //PluginListInvalidationKind kind,  IEnumerable<string> affectedInternalNames 
         void OnActivePluginsChanged(IActivePluginsChangedEventArgs args) => UpdateActivePluginState(args.Kind, args.AffectedInternalNames);
 
@@ -142,7 +141,9 @@ public class Plugin : IDalamudPlugin
 
         //ConfigWindow.Dispose();
         MainWindow.Dispose();
-
+        
+        Service.DataService.AllCombinations.ForEach((p)=>{p.Dispose();});
+        Service.DataService.AllCombinations.Clear();
         Service.CommandManager.RemoveHandler(CommandName);
     }
 

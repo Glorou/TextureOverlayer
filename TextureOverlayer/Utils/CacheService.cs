@@ -30,15 +30,15 @@ public class CacheService
     /// <summary>
     /// 
     /// </summary>
-    private void LoadCache()
+    /*private void LoadCache()
     {
         foreach (var file in Directory.GetFiles(_cacheDir))
         {
             _rawCache.Add(Blake3.Hasher.Hash(File.ReadAllBytes(file)),file.Split('\\').Last()); ;
         }
-    }
+    }*/
     
-/*
+
     private void LoadCache()
     {
         if (File.Exists(_cacheDir + "\\_cache.json"))
@@ -47,12 +47,23 @@ public class CacheService
             {
                 using StreamReader reader = new(_cacheDir + "\\_cache.json");
                 string json = reader.ReadToEnd();
-                _rawCache = JsonConvert.DeserializeObject<Dictionary<Blake3.Hash, String>>(json);
+                var temp = JsonConvert.DeserializeObject<Dictionary<String, String>>(json);
+                foreach (var item in temp)
+                    _rawCache.Add(Blake3.Hash.FromBytes(Convert.FromHexString(item.Key)), item.Value);
             }
             catch (Exception e)
             {
 
             }
+        }
+        else
+        {
+            foreach (var file in Directory.GetFiles(_cacheDir))
+            {
+                _rawCache.Add(Blake3.Hasher.Hash(File.ReadAllBytes(file)),file.Split('\\').Last()); ;
+            }
+
+            WriteCache();
         }
     }
 
@@ -61,7 +72,7 @@ public class CacheService
         var json = JsonConvert.SerializeObject(_rawCache, Formatting.Indented);
         FilesystemUtil.WriteAllTextSafe(_cacheDir + "\\_cache.json", json);
     }
-    */
+    
 
     /// <summary>
     /// This function is called when a user loads a new layer for the first time, it checks if we have an image that
@@ -87,7 +98,7 @@ public class CacheService
             File.Copy(_path, _cacheDir + _newFileName );
             _rawCache.Add(hash, _newFileName);
             texture.Load(Service.TextureManager,_cacheDir + _newFileName);
-            //WriteCache();
+            WriteCache();
             return hash;
 
         }

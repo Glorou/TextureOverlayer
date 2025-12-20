@@ -1,21 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
-<Project Sdk="Dalamud.NET.Sdk/13.0.0">
+<Project Sdk="Dalamud.NET.Sdk/14.0.1">
   <PropertyGroup>
-    <Version>0.5.1</Version>
+    <Version>0.5.2</Version>
     <Description>Penumbra Image Manipulation Plugin</Description>
     <PackageProjectUrl>https://github.com/Glorou/PenumbraImageManipulationPlugin</PackageProjectUrl>
     <PackageLicenseExpression>AGPL-3.0-or-later</PackageLicenseExpression>
     <IsPackable>false</IsPackable>
-    <AssemblyVersion>0.5.1</AssemblyVersion>
+    <AssemblyVersion>0.5.2</AssemblyVersion>
   </PropertyGroup>
     
     
   <ItemGroup>
     <PackageReference Include="Blake3" Version="2.0.0" />
+    <PackageReference Include="Penumbra.Api" Version="5.13.1" />
     <PackageReference Include="SharpDX.Direct3D11" Version="4.2.0" />
     <PackageReference Include="SixLabors.ImageSharp" Version="3.1.11" />
+    <PackageReference Include="TerraFX.Interop.Windows" Version="10.0.26100.6" />
+    <PackageReference Update="DalamudPackager" Version="14.0.1" />
   </ItemGroup>
-    
+
 
     <ItemGroup>
         <EmbeddedResource Include="..\Data\Placeholder.png" />
@@ -35,9 +38,7 @@
   <ItemGroup>
     <Reference Include="OtterTex">
       <HintPath>..\Include\OtterTex.dll</HintPath>
-    </Reference>
-    <Reference Include="Penumbra.Api">
-      <HintPath>..\..\Penumbra\Penumbra\bin\Debug\Penumbra.Api.dll</HintPath>
+        <Private>true</Private>
     </Reference>
   </ItemGroup>
 </Project>

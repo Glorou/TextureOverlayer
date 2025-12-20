@@ -65,7 +65,7 @@ public enum Channels : byte
 /// <summary> Class that encapsulates all data needed to create the combination</summary>
 /// <remarks></remarks>
 [Serializable]
-public class ImageCombination
+public class ImageCombination : IDisposable
 {
     public String Name {get; set;}
 
@@ -81,7 +81,7 @@ public class ImageCombination
     [JsonIgnore]
     private List<CombinedTexture> _sandwich = new List<CombinedTexture>();
     [JsonIgnore]
-    private CombinedTexture comboTex = new CombinedTexture(new Texture(), new Texture());
+    private CombinedTexture? comboTex = new CombinedTexture(new Texture(), new Texture());
     [JsonIgnore]
     public int LoadState { get; set; } //0 == not loaded 1 == loading 2 == loaded
 
@@ -178,9 +178,10 @@ public class ImageCombination
 
     public async Task Compile()
     {
-        flushList(_sandwich);
-        comboTex.Dispose();
         LoadState = 1;
+        flushList(_sandwich);
+        if(comboTex != null)
+            comboTex.Dispose();
         {
             if (layers.Count == 1)
             {
@@ -214,7 +215,23 @@ public class ImageCombination
 
 
     [JsonIgnore]
-    public CombinedTexture CombinedTexture => comboTex;
+    public CombinedTexture CombinedTexture
+    {
+        get
+        {
+            if (comboTex != null)
+            {
+                return comboTex;
+            }
+
+            if (LoadState == 0)
+            {
+                comboTex = new CombinedTexture(new Texture(), new Texture());
+                Compile();
+            }
+            return comboTex;
+        }
+    }
 
     public async Task newStackOps(CombinedTexture tex, ImageLayer layer)
     {
@@ -228,10 +245,24 @@ public class ImageCombination
     {
         foreach (var item in list)
         {
+            
             item.Dispose();
         }
         list.Clear();
     }
+
+    public void Dispose()
+    {
+        foreach (var layer in layers)
+            layer.Dispose();
+        comboTex.Dispose();
+        comboTex = null;
+        flushList(_sandwich);
+        LoadState = 0;
+
+    }
+
+
     
 }
 
@@ -241,7 +272,7 @@ public class ImageCombination
 /// 
 /// </summary>
 [Serializable]
-public class ImageLayer
+public class ImageLayer : IDisposable
 {
 
 
@@ -318,14 +349,41 @@ public class ImageLayer
     {
         return _enabled ? FontAwesomeIcon.Eye.ToIconString() : FontAwesomeIcon.EyeSlash.ToIconString();
     }
-    
+
     /// <summary>
     /// 
     /// </summary>
     /// <returns></returns>
-    public Texture GetTexture() => _texture;
+    //public Texture GetTexture() => _texture;
 
+    
+    public Texture GetTexture()
+    {
+        if (_texture != null)
+        {
+            return _texture;
+        }
+        else
+        {
+            Texture texture = new Texture();
+            Service.CacheService.TryGetCache(texture, _fileHash);
+            this._texture = texture;
+            return _texture;
+        }
+    }
 
+    public void Dispose()
+    {
+        if (_texture != null)
+        {
+            _texture.Dispose();
+            _texture = null;
+        }
+            
+        
+    }
+
+    
     //TODO: make a file fetch function that will check that the file exists, if not requery to check if it still exists at all
 } 
 

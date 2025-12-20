@@ -36,7 +36,7 @@ public class DataService
         }
     }
 
-    public ImageCombination GetImageCombination(String name)
+    public ImageCombination? GetImageCombination(String name)
     {
         return _allCombinations.Find(x => x.Name == name);
     }
@@ -89,7 +89,23 @@ public class DataService
     /// <param name="name"></param>
     public void SetSelectedCombo(string name)
     {
+        ImageCombination temp;
+        if (selectedCombination != name)
+        {
+             temp = GetImageCombination(selectedCombination);
+            if (temp != null)
+            {
+                /*foreach (var layer in temp.Layers)
+                {
+                    layer.Dispose();
+                }*/
+            }
+        }
         selectedCombination = name;
+        
+        GetImageCombination(name);
+
+
     }
 
     public String GetSelectedCombo() => selectedCombination;

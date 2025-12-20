@@ -198,8 +198,8 @@ public class MainWindow : Window, IDisposable
                     {
                         selectedCombination = combo;
                         Service.DataService.SetSelectedCombo(combo.Name);
-                        if(!selectedCombination.CombinedTexture.IsLoaded)
-                            Task.Run(() => { selectedCombination.Compile();});
+                        if(selectedCombination.LoadState < 2)
+                            Task.Run(() => { _ = selectedCombination.Compile();});
                         tempGamePath = combo._gamepath;
                     }
 
@@ -240,17 +240,12 @@ public class MainWindow : Window, IDisposable
                 Task.Run(() => { selectedCombination.Compile();});
                 if (selectedCombination.Enabled)
                 {
-                    if (Plugin.PenumbraApiVersion.Item2 <= 12)
-                    {
-                        Service.penumbraApi.RedrawAll();  
-                    }
-                    else
-                    {
+
                         foreach (var collection in selectedCombination.collection)
                         {
                             Service.penumbraApi.RedrawCollection(collection.Key);
+
                         }
-                    }
 
                 }
             }
@@ -272,7 +267,6 @@ public class MainWindow : Window, IDisposable
 
         ImGui.SameLine();
         ImGui.BeginGroup();
-        //TODO: Make a load wheel and figure out how to not lock up the game while the compile process runs
         using (var previewer = ImRaii.Child("previewer"))
         {
             using (var imageContainer = ImRaii.Child("imageContainer", new Vector2(ImGui.GetContentRegionAvail().X * .75f, ImGui.GetContentRegionAvail().Y)))

@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Numerics;
+using System.Runtime.InteropServices;
 using System.Threading;
 using System.Threading.Tasks;
 using Dalamud.Interface;
@@ -15,12 +16,12 @@ using OtterGui.Log;
 using OtterGui.Services;
 using OtterGui.Tasks;
 using OtterTex;
-using SharpDX.Direct3D11;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.Formats.Png;
 using SixLabors.ImageSharp.Formats.Tga;
 using SixLabors.ImageSharp.PixelFormats;
-using DxgiDevice = SharpDX.DXGI.Device;
+using TerraFX.Interop.DirectX;
+using TerraFX.Interop.Windows;
 using Image = SixLabors.ImageSharp.Image;
 
 namespace TextureOverlayer.Textures;
@@ -133,11 +134,11 @@ public sealed class TextureManager(IDataManager gameData, Logger logger, ITextur
             switch (_type)
             {
                 case TextureType.Png:
-                    data?.SaveAsync(_outputPath, new PngEncoder() { CompressionLevel = PngCompressionLevel.NoCompression }, cancel)
+                    data?.SaveAsync(_outputPath, new PngEncoder { CompressionLevel = PngCompressionLevel.NoCompression }, cancel)
                         .Wait(cancel);
                     return;
                 case TextureType.Targa:
-                    data?.SaveAsync(_outputPath, new TgaEncoder()
+                    data?.SaveAsync(_outputPath, new TgaEncoder
                     {
                         Compression  = TgaCompression.None,
                         BitsPerPixel = TgaBitsPerPixel.Pixel32,
@@ -162,7 +163,6 @@ public sealed class TextureManager(IDataManager gameData, Logger logger, ITextur
     }
 
     private class SaveAsAction : IAction
-    
     {
         private readonly TextureManager                  _textures;
         private readonly string                          _outputPath;
@@ -213,11 +213,16 @@ public sealed class TextureManager(IDataManager gameData, Logger logger, ITextur
                     rgba, width, height),
                 CombinedTexture.TextureSaveType.AsIs when imageTypeBehaviour is TextureType.Dds => AddMipMaps(image.AsDds!, _mipMaps),
                 CombinedTexture.TextureSaveType.Bitmap => ConvertToRgbaDds(image, _mipMaps, cancel, rgba, width, height),
-                CombinedTexture.TextureSaveType.BC1 => _textures.ConvertToCompressedDds(image, _mipMaps, DXGIFormat.BC1UNorm, cancel, rgba, width, height),
-                CombinedTexture.TextureSaveType.BC3 => _textures.ConvertToCompressedDds(image, _mipMaps, DXGIFormat.BC3UNorm, cancel, rgba, width, height),
-                CombinedTexture.TextureSaveType.BC4 => _textures.ConvertToCompressedDds(image, _mipMaps, DXGIFormat.BC4UNorm, cancel, rgba, width, height),
-                CombinedTexture.TextureSaveType.BC5 => _textures.ConvertToCompressedDds(image, _mipMaps, DXGIFormat.BC5UNorm, cancel, rgba, width, height),
-                CombinedTexture.TextureSaveType.BC7 => _textures.ConvertToCompressedDds(image, _mipMaps, DXGIFormat.BC7UNorm, cancel, rgba, width, height),
+                CombinedTexture.TextureSaveType.BC1 => _textures.ConvertToCompressedDds(image, _mipMaps, DXGIFormat.BC1UNorm, cancel, rgba,
+                    width, height),
+                CombinedTexture.TextureSaveType.BC3 => _textures.ConvertToCompressedDds(image, _mipMaps, DXGIFormat.BC3UNorm, cancel, rgba,
+                    width, height),
+                CombinedTexture.TextureSaveType.BC4 => _textures.ConvertToCompressedDds(image, _mipMaps, DXGIFormat.BC4UNorm, cancel, rgba,
+                    width, height),
+                CombinedTexture.TextureSaveType.BC5 => _textures.ConvertToCompressedDds(image, _mipMaps, DXGIFormat.BC5UNorm, cancel, rgba,
+                    width, height),
+                CombinedTexture.TextureSaveType.BC7 => _textures.ConvertToCompressedDds(image, _mipMaps, DXGIFormat.BC7UNorm, cancel, rgba,
+                    width, height),
                 _ => throw new Exception("Wrong save type."),
             };
 
@@ -399,7 +404,7 @@ public sealed class TextureManager(IDataManager gameData, Logger logger, ITextur
     }
 
     /// <summary> Create a BC3 or BC7 block-compressed .dds from the input (optionally with mipmaps). Returns input (+ mipmaps) if it is already the correct format. </summary>
-    public ScratchImage CreateCompressed(ScratchImage input, bool mipMaps, DXGIFormat format, CancellationToken cancel)
+    public unsafe ScratchImage CreateCompressed(ScratchImage input, bool mipMaps, DXGIFormat format, CancellationToken cancel)
     {
         if (input.Meta.Format == format)
             return input;
@@ -415,11 +420,58 @@ public sealed class TextureManager(IDataManager gameData, Logger logger, ITextur
         // See https://github.com/microsoft/DirectXTex/wiki/Compress#parameters for the format condition.
         if (format is DXGIFormat.BC6HUF16 or DXGIFormat.BC6HSF16 or DXGIFormat.BC7UNorm or DXGIFormat.BC7UNormSRGB)
         {
-            var device     = uiBuilder.Device;
-            var dxgiDevice = device.QueryInterface<DxgiDevice>();
+            ref var      device = ref *(ID3D11Device*)uiBuilder.DeviceHandle;
+            IDXGIDevice* dxgiDevice;
+            Marshal.ThrowExceptionForHR(device.QueryInterface(TerraFX.Interop.Windows.Windows.__uuidof<IDXGIDevice>(), (void**)&dxgiDevice));
 
-            using var deviceClone = new Device(dxgiDevice.Adapter, device.CreationFlags, device.FeatureLevel);
-            return input.Compress(deviceClone.NativePointer, format, CompressFlags.Parallel);
+            try
+            {
+                IDXGIAdapter* adapter = null;
+                Marshal.ThrowExceptionForHR(dxgiDevice->GetAdapter(&adapter));
+                try
+                {
+                    dxgiDevice->Release();
+                    dxgiDevice = null;
+
+                    ID3D11Device*        deviceClone  = null;
+                    ID3D11DeviceContext* contextClone = null;
+                    var                  featureLevel = device.GetFeatureLevel();
+                    Marshal.ThrowExceptionForHR(DirectX.D3D11CreateDevice(
+                        adapter,
+                        D3D_DRIVER_TYPE.D3D_DRIVER_TYPE_UNKNOWN,
+                        HMODULE.NULL,
+                        device.GetCreationFlags(),
+                        &featureLevel,
+                        1,
+                        D3D11.D3D11_SDK_VERSION,
+                        &deviceClone,
+                        null,
+                        &contextClone));
+                    try
+                    {
+                        adapter->Release();
+                        adapter = null;
+                        return input.Compress((nint)deviceClone, format, CompressFlags.Parallel);
+                    }
+                    finally
+                    {
+                        if (contextClone is not null)
+                            contextClone->Release();
+                        if (deviceClone is not null)
+                            deviceClone->Release();
+                    }
+                }
+                finally
+                {
+                    if (adapter is not null)
+                        adapter->Release();
+                }
+            }
+            finally
+            {
+                if (dxgiDevice is not null)
+                    dxgiDevice->Release();
+            }
         }
 
         return input.Compress(format, CompressFlags.BC7Quick | CompressFlags.Parallel);
@@ -465,7 +517,7 @@ public sealed class TextureManager(IDataManager gameData, Logger logger, ITextur
         GC.KeepAlive(input);
     }
 
-    private readonly struct ImageInputData
+    private readonly struct ImageInputData : IEquatable<ImageInputData>
     {
         private readonly string? _inputPath;
 
@@ -533,5 +585,8 @@ public sealed class TextureManager(IDataManager gameData, Logger logger, ITextur
 
         public override int GetHashCode()
             => _inputPath != null ? _inputPath.ToLowerInvariant().GetHashCode() : HashCode.Combine(_width, _height);
+
+        public override bool Equals(object? obj)
+            => obj is ImageInputData o && Equals(o);
     }
 }
